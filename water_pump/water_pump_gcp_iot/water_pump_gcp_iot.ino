@@ -8,6 +8,7 @@ int pumpPower = 255; // max 255
 int defaultPumpSeconds = 5; // pump on time
 int defaultMoistureReportSeconds = 10 * 60; // moisture reporting interval
 int defaultPumpCheckSeconds = 60 * 60; // interval for automatic pumping check 1hr
+int defaultMoistureThreshold = 400; // wet 0 - 1023 dry
 
 bool manualMode = false;
 char debugMsg[128];
@@ -74,6 +75,12 @@ void messageReceived(String &topic, String &payload) {
     defaultMoistureReportSeconds = duration;
     snprintf(debugMsg, 128, "Set default moisture reporting duration to %d seconds", defaultMoistureReportSeconds);
     publishTelemetry(debugMsg);
+  } else if (topic == "/devices/water-pump/commands/moisture_threshold") {
+    // moisture threshold 0-1023
+    int threshold = payload.toInt();
+    defaultMoistureThreshold = threshold;
+    snprintf(debugMsg, 128, "Set default moisture threshold to %d", defaultMoistureThreshold);
+    publishTelemetry(debugMsg);
   } else if (topic == "/devices/water-pump/commands/pump_check_seconds") {
     // how often to check if we need to water
     int duration = payload.toInt();
@@ -105,7 +112,7 @@ void loop() {
     // check whether we need to pump every few mins
     if (millis() - checkMillis > defaultPumpCheckSeconds*1000) {
       checkMillis = millis();
-      if (readMoistureSensor() > 400) {
+      if (readMoistureSensor() > defaultMoistureThreshold) {
         pumpSeconds(defaultPumpSeconds);
       }
     }

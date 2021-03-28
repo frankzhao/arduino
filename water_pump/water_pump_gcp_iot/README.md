@@ -18,6 +18,7 @@ Google Cloud IoT controlled water pump
   the specified duration in seconds.
 * `/moisture_seconds(s)` changes the interval which the moisture sensor 
   value is reported in seconds.
+* `/moisture_threshold(n)` threshold for moisture sensor to start pumping.
 * `/pump_check_seconds(s)` changes the interval in seconds for condition 
   checking in automatic mode. This determines the automatic pumping frequency.
 
